@@ -1,0 +1,50 @@
+services:
+  wordpress:
+    image: wordpress:php8.2-apache
+    container_name: kitweb-wordpress
+    restart: unless-stopped
+    ports:
+      - "8086:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: kitweb_user
+      WORDPRESS_DB_PASSWORD: kitweb_password
+      WORDPRESS_DB_NAME: kitweb_wp
+      WORDPRESS_TABLE_PREFIX: wp_
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mariadb:10.11
+    container_name: kitweb-mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: kitweb_wp
+      MYSQL_USER: kitweb_user
+      MYSQL_PASSWORD: kitweb_password
+      MYSQL_ROOT_PASSWORD: kitweb_root_password
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: kitweb-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8087:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      - db
+
+volumes:
+  db_data:
