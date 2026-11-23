@@ -1,8 +1,14 @@
 <?php
+declare(strict_types=1);
+
 /**
- * The base configuration for WordPress
- * Environment-aware with sensible local defaults.
+ * WordPress Starter Kit - Environment-Aware Configuration
+ *
+ * Automatically adapts across Docker, local development (LAMP/MAMP/Valet),
+ * staging, and production environments.
  */
+
+// ** Database Connection Settings ** //
 define( 'DB_NAME', getenv('WORDPRESS_DB_NAME') ?: (getenv('DB_NAME') ?: 'kitweb_wp') );
 define( 'DB_USER', getenv('WORDPRESS_DB_USER') ?: (getenv('DB_USER') ?: 'kitweb_user') );
 define( 'DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') ?: (getenv('DB_PASSWORD') ?: 'kitweb_password') );
@@ -10,6 +16,19 @@ define( 'DB_HOST', getenv('WORDPRESS_DB_HOST') ?: (getenv('DB_HOST') ?: 'localho
 define( 'DB_CHARSET', 'utf8mb4' );
 define( 'DB_COLLATE', '' );
 
+// ** Reverse Proxy & SSL Termination Awareness ** //
+if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
+    $_SERVER['HTTPS'] = 'on';
+}
+
+// ** Dynamic Site URL Resolution (Supports Docker ports and arbitrary domains) ** //
+if ( isset( $_SERVER['HTTP_HOST'] ) ) {
+    $http_scheme = ( ! empty( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] !== 'off' ) ? 'https://' : 'http://';
+    define( 'WP_HOME', $http_scheme . $_SERVER['HTTP_HOST'] );
+    define( 'WP_SITEURL', $http_scheme . $_SERVER['HTTP_HOST'] );
+}
+
+// ** Authentication Unique Keys and Salts ** //
 define( 'AUTH_KEY',         'xT&QJ!|*t(G-Q9-t=Q%w.11e)8j:p+V72v7x0a|gW=9452427a7c132840' );
 define( 'SECURE_AUTH_KEY',  'n2_w558064434e320f779b6d61f1cb4d142b7811bb1fef544e3efbfbcf' );
 define( 'LOGGED_IN_KEY',    '7b63f707f593256dbdcb51df527d928a5ce08051a8ba9fa1a3cf84dd36' );
@@ -19,11 +38,25 @@ define( 'SECURE_AUTH_SALT', '69a194ce0b9858597f7faea5aebf132e185e921b777a28848d5
 define( 'LOGGED_IN_SALT',   '137e7a83d34fffa5ca884d5df6d2ad3178c187e1f435e076e273a246d8' );
 define( 'NONCE_SALT',       '844697bfda30fa00beff8ab55859779be740e536109966db263923fc81' );
 
-$table_prefix = 'wp_';
-define( 'WP_DEBUG', false );
+// ** Database Table Prefix ** //
+$table_prefix = getenv('WORDPRESS_TABLE_PREFIX') ?: 'wp_';
 
+// ** Developer & Debugging Flags ** //
+$is_debug = getenv('WP_DEBUG') === 'true' || getenv('WP_DEBUG') === '1';
+define( 'WP_DEBUG', $is_debug );
+define( 'WP_DEBUG_LOG', $is_debug );
+define( 'WP_DEBUG_DISPLAY', false );
+@ini_set( 'display_errors', $is_debug ? '1' : '0' );
+
+// ** Memory & Filesystem Optimizations ** //
+define( 'WP_MEMORY_LIMIT', '256M' );
+define( 'WP_MAX_MEMORY_LIMIT', '512M' );
+define( 'FS_METHOD', 'direct' );
+
+// ** Absolute path to the WordPress directory ** //
 if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', __DIR__ . '/' );
+    define( 'ABSPATH', __DIR__ . '/' );
 }
 
+// ** Sets up WordPress vars and included files ** //
 require_once ABSPATH . 'wp-settings.php';

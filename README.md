@@ -1,106 +1,154 @@
-# Turnkey WordPress Corporate Business & Agency Starter Template
+# WordPress Containerized Starter Kit (wordpress-starter-kit)
 
-[![WordPress](https://img.shields.io/badge/WordPress-Ready-21759B?style=for-the-badge&logo=wordpress&logoColor=white)](https://wordpress.org)
-[![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net)
+[![WordPress](https://img.shields.io/badge/WordPress-6.x%20Ready-21759B?style=for-the-badge&logo=wordpress&logoColor=white)](https://wordpress.org)
+[![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net)
 [![MariaDB](https://img.shields.io/badge/MariaDB-10.11-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
-[![Betheme](https://img.shields.io/badge/Theme-Betheme%20Premium-FF6C37?style=for-the-badge)](https://muffingroup.com/betheme/)
-[![Slider Revolution](https://img.shields.io/badge/Slider-Revolution-E03A3E?style=for-the-badge)](https://revolution.themepunch.com/)
+[![WP-CLI](https://img.shields.io/badge/WP--CLI-Integrated-11a0d2?style=for-the-badge&logo=wordpress&logoColor=white)](https://wp-cli.org)
+[![Mailpit](https://img.shields.io/badge/Email-Mailpit-e05d44?style=for-the-badge)](https://github.com/axllent/mailpit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
-A ready-to-deploy turnkey WordPress starter kit and corporate website template equipped with the premium **Betheme** engine, **Slider Revolution**, and **Contact Form 7**. Designed as an enterprise-grade scaffolding for software agencies, digital marketing consultancies, technology providers, and corporate service firms.
-
----
-
-## 🌟 Key Highlights & Template Features
-
-- **Betheme Framework Scaffolding**: Built-in responsive grid system, 600+ Google Fonts, custom CSS/JS injectors, customizable header styles, mega menus, and mobile off-canvas navigation.
-- **Cinematic Presentation Layers**: Pre-installed Slider Revolution with hardware-accelerated transitions and interactive banner modules.
-- **Customer Inquiry Automation**: Fully integrated Contact Form 7 workflows with customized lead generation fields and anti-spam handling.
-- **Instant Local Dockerization**: Complete Docker Compose setup spinning up WordPress (PHP 8.2), MariaDB 10.11, and phpMyAdmin in one command.
-- **Dynamic Environment Binding**: `wp-config.php` engineered to read containerized environment variables with automatic local fallbacks.
+A modern, developer-first, containerized **WordPress Starter Kit and Local Development Environment**. Engineered for developers, agencies, and freelancers to prototype, build, and test custom themes, plugins, and scalable client sites with zero host dependencies.
 
 ---
 
-## 🏗️ Architecture & Component Topology
+## 🌟 What is Included in the Box?
+
+- **Containerized WordPress (PHP 8.2 Apache):** High-performance core container pre-configured with `mod_rewrite`, upload limits (256M/512M), and standard GD/Imagick extensions.
+- **MariaDB 10.11 Database:** Fast, reliable relational database with automated Docker healthchecks and persistent storage volumes.
+- **Visual Database Management (phpMyAdmin 5.2):** Pre-linked web interface for visual table inspection, running queries, and database exports.
+- **Local Email Interceptor (Mailpit):** Zero-configuration local SMTP server (port 1025) and beautiful web UI (port 8025) to preview outgoing transactional emails, password resets, and contact form submissions without external SMTP credentials.
+- **Integrated WP-CLI Container:** Execute any WordPress CLI command (install plugins, generate dummy content, run migrations, manage users) directly through Docker without installing PHP or WP-CLI on your machine.
+- **Dynamic & Safe `wp-config.php`:** Automatically detects host names and ports (`$_SERVER['HTTP_HOST']`), reverse proxy SSL termination (`HTTP_X_FORWARDED_PROTO`), and binds environment variables cleanly.
+- **Agency Assets & Tools:** Includes Betheme core, Slider Revolution, and Contact Form 7 scaffolding ready for rapid agency development.
+
+---
+
+## 🏗️ Architecture & Service Topology
 
 ```
 +-------------------------------------------------------------+
-|                     Client Browser                          |
+|                      Host Machine                           |
 +-------------------------------------------------------------+
-                              | HTTP (Port 8086)
-                              v
-+-------------------------------------------------------------+
-|              WordPress App Container (PHP 8.2)              |
-|  - WordPress Core Framework                                 |
-|  - Betheme Responsive Multi-Purpose Engine                  |
-|  - Visual Hero Slider Engine (Slider Revolution)            |
-|  - Contact & Lead Forms (Contact Form 7)                    |
-+-------------------------------------------------------------+
-                              | TCP / MySQL protocol
-                              v
-+-------------------------------------------------------------+
-|              Database Service (MariaDB 10.11)               |
-|  - Schema: kitweb_wp                                        |
-|  - Container Healthcheck with InnoDB auto-detection         |
-+-------------------------------------------------------------+
-                              |
-                              v
-+-------------------------------------------------------------+
-|              phpMyAdmin Service (Port 8087)                 |
-|  - Visual management of tables, options, and taxonomies     |
-+-------------------------------------------------------------+
+     |                  |                   |               |
+     | Port 8086        | Port 8087         | Port 8025     | WP-CLI
+     v                  v                   v               v
++-------------+   +-------------+   +-------------+   +-------------+
+|  WordPress  |   | phpMyAdmin  |   |   Mailpit   |   |   WP-CLI    |
+|  (PHP 8.2)  |   | (Admin UI)  |   | (Email UI)  |   | (Container) |
++-------------+   +-------------+   +-------------+   +-------------+
+        |                 |                                  |
+        +--------+--------+----------------------------------+
+                 | TCP / Port 3306
+                 v
+        +-----------------------+
+        |   MariaDB (10.11)     |
+        |   Persistent DB Data  |
+        +-----------------------+
 ```
 
 ---
 
-## 🚀 Quick Start with Docker Compose
-
-Run the entire corporate WordPress portal locally with zero dependencies:
+## 🚀 Quick Start (Automated Setup)
 
 ### 1. Clone the Repository
 ```bash
-git clone git@github.com-personal:KevinAndrey96/kit-web.git
-cd kit-web
+git clone git@github.com:KevinAndrey96/wordpress-starter-kit.git
+cd wordpress-starter-kit
 ```
 
-### 2. Launch the Stack
+### 2. Boot the Docker Stack
 ```bash
+make up
+# or using standard docker command:
 docker compose up -d
 ```
 
-### 3. Complete Initial Setup or Access
-- **Website Frontpage**: [http://localhost:8086](http://localhost:8086)
-- **WordPress Admin**: [http://localhost:8086/wp-admin](http://localhost:8086/wp-admin)
-- **phpMyAdmin**: [http://localhost:8087](http://localhost:8087) (Server: `db`, User: `kitweb_user`, Password: `kitweb_password`)
+### 3. Automated WordPress Installation (One Command)
+Run the automated installation script via WP-CLI to create the database schema and default administrator:
+```bash
+make install
+```
+
+This immediately configures:
+- **Site URL:** [http://localhost:8086](http://localhost:8086)
+- **Admin Dashboard:** [http://localhost:8086/wp-admin](http://localhost:8086/wp-admin)
+- **Username:** `admin`
+- **Password:** `admin123`
+- **Email:** `admin@starter.local`
 
 ---
 
-## 💻 Manual Deployment (LAMP / cPanel / Shared Hosting)
+## 🌐 Application Endpoints & Ports
 
-1. Upload all repository files to your server web root (`public_html/` or `/var/www/html/`).
-2. Create a MySQL/MariaDB database in your hosting control panel.
-3. Configure your database connection in `wp-config.php` or export environment variables:
-   ```php
-   define( 'DB_NAME', 'your_db_name' );
-   define( 'DB_USER', 'your_db_user' );
-   define( 'DB_PASSWORD', 'your_db_password' );
-   define( 'DB_HOST', 'localhost' );
-   ```
-4. Open your domain URL in your browser to run the 1-minute WordPress setup wizard and activate your chosen Betheme layout.
+| Service | Port | Description |
+| :--- | :--- | :--- |
+| **WordPress Storefront** | [http://localhost:8086](http://localhost:8086) | Main website frontend |
+| **WordPress Admin** | [http://localhost:8086/wp-admin](http://localhost:8086/wp-admin) | WP-Admin management dashboard |
+| **phpMyAdmin** | [http://localhost:8087](http://localhost:8087) | Database management interface |
+| **Mailpit Web UI** | [http://localhost:8025](http://localhost:8025) | Local inbox for intercepted emails |
+| **Mailpit SMTP Server** | `localhost:1025` | Local SMTP relay for plugins & mailers |
 
 ---
 
-## 📦 Installed Plugins & Themes
+## 🛠️ Developer Makefile Commands
 
-| Component | Category | Purpose | Status |
-| :--- | :--- | :--- | :---: |
-| **Betheme** | Premium Theme | Responsive layout engine, mega menus, typography | Active |
-| **Slider Revolution** | Premium Plugin | Layered animated banners, touch-swipe sliders | Active |
-| **Contact Form 7** | Plugin | Contact forms, feedback handling, lead capture | Active |
+The included `Makefile` provides convenient shortcuts for common container and WP-CLI tasks:
+
+```bash
+# Start all containers in the background
+make up
+
+# Stop all containers
+make down
+
+# View real-time container logs
+make logs
+
+# Check container health and status
+make status
+
+# Execute WP-CLI commands
+make cli CMD="plugin list"
+make cli CMD="theme list"
+make cli CMD="user list"
+
+# Install a plugin from the WordPress repository
+make cli CMD="plugin install woocommerce --activate"
+
+# Export the database
+make cli CMD="db export backup.sql"
+
+# Clean containers and wipe database volumes
+make clean
+```
 
 ---
 
-## 🛡️ License & Attributions
+## ⚙️ Environment Variables Reference
 
-- WordPress core is licensed under the **GNU General Public License v2 or later**.
-- Custom layout modifications, configuration scripts, and template structuring are maintained for developer portfolio demonstration and deployment template usage.
+You can customize ports and credentials via an optional `.env` file (copied from `.env.example`):
+
+| Variable | Default Value | Description |
+| :--- | :--- | :--- |
+| `WORDPRESS_PORT` | `8086` | Exposed host port for WordPress |
+| `PHPMYADMIN_PORT` | `8087` | Exposed host port for phpMyAdmin |
+| `MAILPIT_WEB_PORT` | `8025` | Exposed host port for Mailpit Web UI |
+| `WORDPRESS_DB_NAME` | `starter_db` | MySQL / MariaDB database name |
+| `WORDPRESS_DB_USER` | `starter_user` | Database user account |
+| `WORDPRESS_DB_PASSWORD` | `starter_password` | Database password |
+| `WP_DEBUG` | `true` | Enables WordPress debug logs |
+
+---
+
+## 👨‍💻 Author
+
+- **Kevin Andrey Herrera Silva**
+- GitHub: [@KevinAndrey96](https://github.com/KevinAndrey96)
+- Email: `kahs_kevin@hotmail.com`
+
+---
+
+## 📄 License
+
+This starter kit is open-source software licensed under the **MIT License**.
